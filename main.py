@@ -1,34 +1,28 @@
-import os
 from dotenv import load_dotenv
-from llama_index.llms.groq import Groq
-from llama_index.embeddings.fastembed import FastEmbedEmbedding
-from llama_index.core import Settings
+from llama_index.core import VectorStoreIndex
 
+from src.data_loader import load_fastapi_docs
 
 load_dotenv()
 
 
-# === LLM SETUP ===
-llm = Groq(
-    model="llama-3-70b-8192t",
-    api_key=os.getenv("GROQ_API_KEY"),
-)
+if __name__ == "__main__":
+    print("Starting ContextIQ RAG...")
 
-# === Embedding Model ===
+    documents = load_fastapi_docs()
 
-embed_model = FastEmbedEmbedding(
-    model_name="BAAI/bge-small-en-v1.5",
-)
+    print("creating vector store index...")
+    index = VectorStoreIndex.from_documents(documents)
 
-Settings.llm = llm
-Settings.embed_model = embed_model
+    query_engine = index.as_query_engine()
 
+    response = query_engine.query("How to use FastAPI dependency injection with classes?")
 
-print("ContextIQ setup successful!")
-print(f"Using LLM: {llm.model}")
-print("Embedding model loaded - ready for RAG!")
-
-
+    print("\n" + "="*60)
+    print("Answer:")
+    print(response)
+    print("="*60 + "\n")
+    print(f"\nSources Used: {len(response.source_nodes)}")
 
 
 
