@@ -19,23 +19,66 @@ Settings.embed_model = FastEmbedEmbedding(
 )
 
 
-# === load fastapi docs ===
+def configure_chunking(chunk_size: int = 1024, chunk_overlap: int = 200):
+    """
+    chunk_size: how many tokens per chunk (bigger = more context, but less precise retrieval)
+    chunk_overlap: tokens shared between consecutive chunks (prevents losing context at boundaries)
 
-def load_fastapi_docs():
-    print("Loading FastAPI docs...")
+    Think of it like reading a book with sticky notes:
+      - chunk_size = how much text fits on each sticky note
+      - chunk_overlap = how many lines you copy to the NEXT sticky note so you don't lose context
+    """
+    Settings.chunk_size = chunk_size
+    Settings.chunk_overlap = chunk_overlap
+    print(f"  Chunking config: chunk_size={chunk_size}, chunk_overlap={chunk_overlap}")
 
-    urls = [
-        "https://fastapi.tiangolo.com/",
-        "https://fastapi.tiangolo.com/tutorial/dependencies/",
-        "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
-        "https://fastapi.tiangolo.com/advanced/dependencies/",
-    ]
+
+FASTAPI_URLS = [
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
+    "https://fastapi.tiangolo.com/advanced/dependencies/",
+]
+
+REACT_URLS = [
+    "https://react.dev/",
+    "https://react.dev/reference/react/useState",
+    "https://react.dev/reference/react/useEffect",
+    "https://react.dev/learn/managing-state",
+]
+AWS_URLS = [
+    "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+    "https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html",
+]
+
+
+def load_developer_docs(chunk_size: int = 1024, chunk_overlap: int = 200):
+    """Load docs from multiple domains and tag each document with its source."""
+    configure_chunking(chunk_size, chunk_overlap)
 
     reader = SimpleWebPageReader(html_to_text=True)
-    documents = reader.load_data(urls)
 
-    print(f"loaded {len(documents)} docs from fast api docs")
-    for i, doc in enumerate(documents[:3]): # preview of 3 only
-        print(f"Document{i+1}: {doc.metadata.get('url', 'No URL')} - {len(doc.text)} characters")
-        
-    return documents
+    all_docs = []
+    sources = {
+        "FastAPI": FASTAPI_URLS,
+        "React": REACT_URLS,
+        "AWS": AWS_URLS
+        }
+
+    for source_name, urls in sources.items():
+        print(f"  Loading {source_name} docs ({len(urls)} pages)...")
+        docs = reader.load_data(urls)
+        for doc in docs:
+            doc.metadata["source"] = source_name
+        all_docs.extend(docs)
+        print(f"    [OK] Loaded {len(docs)} documents from {source_name}")
+
+    print(f"\n  Total: {len(all_docs)} documents loaded")
+    for doc in all_docs:
+        url = doc.metadata.get("url", "unknown")
+        preview = doc.text[:80].replace("\n", " ").strip()
+        preview = preview.encode("ascii", errors="replace").decode("ascii")
+        print(f"    [{doc.metadata['source']}] {url}")
+        print(f"      Preview: {preview}...")
+
+    return all_docs
