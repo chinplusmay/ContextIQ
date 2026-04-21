@@ -39,13 +39,13 @@ if __name__ == "__main__":
     print("  [OK] Index created")
 
     # Create query engine
-    query_engine = index.as_query_engine(similarity_top_k=3)
+    query_engine = index.as_query_engine(similarity_top_k=4)
 
       # Test with questions from BOTH domains
-    print("\n--- Testing cross-domain retrieval ---")
-
+    print("\n--- Testing with expanded knowledge base ---")
     ask(query_engine, "How do I use dependency injection in FastAPI?")
     ask(query_engine, "How does useState work in React?")
-    ask(query_engine, "What is useEffect and when should I use it?")
-    ask(query_engine, "What is a lambda function and how do I use it?")
+    ask(query_engine, "How do I create a simple AWS Lambda function in Python?")
+    ask(query_engine, "How can I secure my FastAPI app with JWT?")         
+    ask(query_engine, "What is the difference between useEffect and useReducer?")
 

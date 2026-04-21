@@ -33,12 +33,15 @@ def configure_chunking(chunk_size: int = 1024, chunk_overlap: int = 200):
     Settings.chunk_overlap = chunk_overlap
     print(f"  Chunking config: chunk_size={chunk_size}, chunk_overlap={chunk_overlap}")
 
-
 FASTAPI_URLS = [
     "https://fastapi.tiangolo.com/",
     "https://fastapi.tiangolo.com/tutorial/dependencies/",
     "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
     "https://fastapi.tiangolo.com/advanced/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/",
+    "https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
 ]
 
 REACT_URLS = [
@@ -46,12 +49,19 @@ REACT_URLS = [
     "https://react.dev/reference/react/useState",
     "https://react.dev/reference/react/useEffect",
     "https://react.dev/learn/managing-state",
+    "https://react.dev/reference/react/useContext",
+    "https://react.dev/reference/react/useReducer",
+    "https://react.dev/learn/render-and-commit",
+    "https://react.dev/learn/keeping-components-pure",
 ]
+
 AWS_URLS = [
     "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
     "https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html",
+    "https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html",
+    "https://docs.aws.amazon.com/lambda/latest/dg/python-context.html",
+    "https://docs.aws.amazon.com/lambda/latest/dg/services-s3.html",   # new
 ]
-
 
 def load_developer_docs(chunk_size: int = 1024, chunk_overlap: int = 200):
     """Load docs from multiple domains and tag each document with its source."""
