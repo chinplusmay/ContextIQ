@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 from llama_index.core import VectorStoreIndex
-from src.data_loader import load_developer_docs, inspect_naive_chunks
+from src.data_loader import load_developer_docs, get_qdrant_vector_store
+from llama_index.core import StorageContext
+
 
 load_dotenv()
 
@@ -26,12 +28,21 @@ def ask(query_engine, question: str):
 
 if __name__ == "__main__":
     # Load documents from both domains
-    print("Step 1: Loading documents...")
+    print("Loading documents...")
     documents = load_developer_docs(chunk_size=1024, chunk_overlap=200)
 
-    # Inspect naive chunks
-    print("\nStep 2: Inspecting naive chunks...")
-    naive_chunks = inspect_naive_chunks(documents)
+    # Create Qdrant vector store
+    vector_store = get_qdrant_vector_store()
+    
+    # Create storage context and index
+    print("\nCreating StorageContext + VectorStoreIndex with Qdrant...")
+    storage_context = StorageContext.from_defaults(vector_store=vector_store)
+
+    index = VectorStoreIndex.from_documents(
+        documents,
+        storage_context=storage_context
+    )
+    print("  [OK] Index built and stored in Qdrant")
 
     # Build the vector index (this embeds all chunks)
     print("\nStep 3: Creating vector index (embedding all chunks)...")

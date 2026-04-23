@@ -6,6 +6,10 @@ from llama_index.embeddings.fastembed import FastEmbedEmbedding
 from llama_index.readers.web import SimpleWebPageReader
 from llama_index.core.node_parser import SentenceSplitter
 
+from llama_index.vector_stores.qdrant import QdrantVectorStore
+from llama_index.core import StorageContext, VectorStoreIndex
+from qdrant_client import QdrantClient
+
 load_dotenv()
 
 # === SETUP ===
@@ -95,16 +99,13 @@ def load_developer_docs(chunk_size: int = 1024, chunk_overlap: int = 200):
     return all_docs
 
 
-def inspect_naive_chunks(documents, num_chunks_to_show=3):
-        print("\n🔍 Inspecting Naive Chunking (first few chunks)...")
-        splitter = SentenceSplitter(
-            chunk_size=Settings.chunk_size,
-            chunk_overlap=Settings.chunk_overlap,
-        )
-        nodes = splitter(documents)
-        for i, node in enumerate(nodes[:num_chunks_to_show]):
-            print(f"\n--- Chunk {i+1} (length: {len(node.text)} chars) ---")
-            print(f"Source: {node.metadata.get('source', 'unknown')}")
-            print(f"Preview: {node.text[:300].replace(chr(10), ' ')}...")
-        print(f"\nTotal chunks created: {len(nodes)} (this is what gets embedded)")
-        return nodes
+def get_qdrant_vector_store():
+    client = QdrantClient(":memory:")
+
+    vector_store = QdrantVectorStore(
+        client=client,
+        collection_name="contextiq_docs" #collection name in qdrant
+    )
+    print("  [OK] Qdrant vector store initialized (collection: contextiq_docs)")
+    return vector_store
+    
