@@ -100,12 +100,15 @@ def load_developer_docs(chunk_size: int = 1024, chunk_overlap: int = 200):
 
 
 def get_qdrant_vector_store():
-    client = QdrantClient(":memory:")
+    # Increase timeout: collection creation on first run (especially on
+    # Windows + Docker Desktop) can exceed the default 5s httpx timeout.
+    client = QdrantClient(host="localhost", port=6333, timeout=60)
 
     vector_store = QdrantVectorStore(
         client=client,
         collection_name="contextiq_docs" #collection name in qdrant
     )
-    print("  [OK] Qdrant vector store initialized (collection: contextiq_docs)")
+    print("[OK] Connected to Qdrant Docker (persistent storage)")
     return vector_store
+    
     
